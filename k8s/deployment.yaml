@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: 007400345148.dkr.ecr.ap-south-1.amazonaws.com/petclinic-dev-app:latest
+          image: 007400345148.dkr.ecr.ap-south-1.amazonaws.com/petclinic-dev-app:4
           ports:
             - containerPort: 8080
           env:
