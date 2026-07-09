@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: petclinic
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,26 +22,44 @@ spec:
     spec:
       containers:
         - name: petclinic
-          # Jenkins updates this line on every build
           image: 007400345148.dkr.ecr.ap-south-1.amazonaws.com/petclinic-dev-app:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: DATABASE
+              value: h2
           resources:
             requests:
               memory: "256Mi"
-              cpu: "250m"
+              cpu:    "250m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu:    "500m"
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: 60
-            periodSeconds: 15
+            periodSeconds:       15
+            failureThreshold:    3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds:       10
+            failureThreshold:    3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic
+  namespace: petclinic
+spec:
+  selector:
+    app: petclinic
+  ports:
+    - protocol: TCP
+      port:       80
+      targetPort: 8080
+  type: ClusterIP
